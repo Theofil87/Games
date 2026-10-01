@@ -27,7 +27,8 @@ button{border:1px solid var(--border);background:#18181b;color:var(--fg);border-
 </div>
 <div class="overlay" id="overlay"><div class="card"><h1>BLOKK</h1><p id="msg">Classic Tetris. Clear lines and beat your high score.</p><div class="actions"><button id="start">Start game</button></div></div></div>
 <script>
-const W=10,H=20,ctx=board.getContext('2d'),COLORS=['#d8dee8','#9aa4b2','#7b8798','#b8c1cc','#657184','#c7ced8','#8f9baa'];
+const boardCanvas=document.getElementById('board'),holdCanvas=document.getElementById('hold'),nextCanvas=document.getElementById('next');
+const W=10,H=20,ctx=boardCanvas.getContext('2d'),COLORS=['#d8dee8','#9aa4b2','#7b8798','#b8c1cc','#657184','#c7ced8','#8f9baa'];
 const SHAPES=[
 [[1,1,1,1]],[[1,1],[1,1]],[[0,1,0],[1,1,1]],[[1,0,0],[1,1,1]],[[0,0,1],[1,1,1]],[[0,1,1],[1,1,0]],[[1,1,0],[0,1,1]]
 ];
@@ -43,7 +44,7 @@ function lock(){cur.shape.forEach((r,y)=>r.forEach((v,x)=>{if(v&&cur.y+y>=0)grid
 function clear(){let n=0;grid=grid.filter(r=>{if(r.every(v=>v>=0)){n++;return false}return true});while(grid.length<H)grid.unshift(Array(W).fill(-1));if(n){lines+=n;score += [0,100,300,500,800][n]*level;level=1+Math.floor(lines/10)}}
 function hardDrop(){let d=0;while(move(0,1))d++;score+=d*2;lock();update()}
 function hold(){if(holdUsed)return;let saved=holdPiece;holdPiece={shape:cur.shape.map(r=>r.slice()),c:cur.c};cur=saved?{shape:saved.shape.map(r=>r.slice()),c:saved.c,x:3,y:0}:newPiece();holdUsed=true;update()}
-function update(){scoreEl.textContent=score.toLocaleString();levelEl.textContent=level;linesEl.textContent=lines;bestEl=Math.max(best,score);document.getElementById('best').textContent=bestEl.toLocaleString();draw();mini(hold,holdPiece);mini(next,next)}
+function update(){scoreEl.textContent=score.toLocaleString();levelEl.textContent=level;linesEl.textContent=lines;bestEl=Math.max(best,score);document.getElementById('best').textContent=bestEl.toLocaleString();draw();mini(holdCanvas,holdPiece);mini(nextCanvas,next)}
 const scoreEl=document.getElementById('score'),levelEl=document.getElementById('level'),linesEl=document.getElementById('lines'),overlay=document.getElementById('overlay'),msg=document.getElementById('msg');
 function draw(){ctx.clearRect(0,0,300,600);ctx.fillStyle='#0f1012';ctx.fillRect(0,0,300,600);let cw=30;grid?.forEach((r,y)=>r.forEach((v,x)=>{if(v>=0)cell(ctx,x*cw,y*cw,cw,COLORS[v])}));if(cur)cur.shape.forEach((r,y)=>r.forEach((v,x)=>{if(v)cell(ctx,(cur.x+x)*cw,(cur.y+y)*cw,cw,COLORS[cur.c])}))}
 function cell(c,x,y,s,col){c.fillStyle=col;c.fillRect(x+1,y+1,s-2,s-2)}
